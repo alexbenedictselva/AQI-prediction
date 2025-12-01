@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualize - AQI Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding: 15px 30px;
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-end;
+            height: 60px;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            margin-left: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .navbar a.active {
+            background: rgba(255,255,255,0.2);
+            font-weight: 600;
+        }
+
+        .main-layout {
+            padding-top: 60px;
+            padding: 80px 20px 20px;
+        }
+
+        .chart-section {
+            display: flex;
+            margin-bottom: 40px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        .chart-description {
+            width: 50%;
+            padding: 30px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .chart-container {
+            width: 50%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 0;
+            padding: 20px;
+            margin: 0;
+            border: none;
+        }
+
+        .chart-title {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .chart-img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+        }
+
+        .chart-description {
+            color: white;
+        }
+
+        .chart-description h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .chart-description h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .observation {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border-left: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .observation h4 {
+            font-size: 1rem;
+            margin-bottom: 6px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .chart-description p {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 0;
+            opacity: 0.9;
+            margin-left: 15px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/">Predict</a>
+        <a href="/visualize" class="active">Visualize</a>
+        <a href="/dataset">Dataset</a>
+    </nav>
+
+    <div class="main-layout">
+        <div class="chart-section">
+            <div class="chart-description">
+                <h2><i class="fas fa-chart-bar"></i> AQI Distribution Analysis</h2>
+                
+                <h3>Observations:</h3>
+                
+                <div class="observation">
+                    <h4>1. AQI = 5 dominates the distribution</h4>
+                    <p>Indicates most readings fall in the worst pollution category.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>2. AQI = 4 is the next most frequent</h4>
+                    <p>Shows many samples also belong to poor air quality.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>3. AQI = 1, 2, and 3 have comparatively low counts</h4>
+                    <p>Indicates clean/moderate air is rarely recorded.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>4. Dataset is imbalanced</h4>
+                    <p>Can negatively affect ML model performance if not handled.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>5. Data suggests unhealthy environmental trend</h4>
+                    <p>Can be used to show high air pollution exposure in the region/time period.</p>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">AQI Distribution</div>
+                <img src="data:image/png;base64,{{ plots.aqi_dist }}" class="chart-img" alt="AQI Distribution">
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <div class="chart-description">
+                <h2><i class="fas fa-chart-line"></i> Correlation Analysis</h2>
+                
+                <h3>Observations:</h3>
+                
+                <div class="observation">
+                    <h4>pm2.5 and pm10 have the strongest correlation</h4>
+                    <p>Almost perfect positive correlation (~0.99).</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>co has high correlation with pm2.5 and pm10</h4>
+                    <p>Indicates they often increase together in polluted air.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>o3 has weak / negative correlations with most pollutants</h4>
+                    <p>Suggests ozone behaves differently from the other gases.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>AQI is moderately correlated with pm2.5, pm10, no2, and co</h4>
+                    <p>These pollutants contribute more to AQI rise.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>no2 strongly correlates with co and pm pollutants</h4>
+                    <p>Indicates traffic/combustion sources influence multiple pollutants simultaneously.</p>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Correlation Heatmap</div>
+                <img src="data:image/png;base64,{{ plots.correlation }}" class="chart-img" alt="Correlation Heatmap">
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <div class="chart-description">
+                <h2><i class="fas fa-city"></i> City AQI Distribution Analysis</h2>
+                
+                <h3>Observations:</h3>
+                
+                <div class="observation">
+                    <h4>All pollutant distributions are highly right-skewed</h4>
+                    <p>Majority of values are near zero, with long tails toward high values.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>Most readings fall in low concentration ranges</h4>
+                    <p>Indicates low-to-moderate pollutants are recorded more frequently.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>Few extreme outliers exist in every pollutant</h4>
+                    <p>Suggests occasional spikes in pollution levels.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>o3 has a comparatively wider spread than others</h4>
+                    <p>Distribution stretches more evenly across higher values compared to gases like CO/NO.</p>
+                </div>
+                
+                <div class="observation">
+                    <h4>pm2.5 and pm10 show very similar distribution patterns</h4>
+                    <p>Both follow the same trend, supporting their strong correlation.</p>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">City AQI Distribution</div>
+                <img src="data:image/png;base64,{{ plots.city_aqi }}" class="chart-img" alt="City-wise AQI Distribution">
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,4 +1,11 @@
 from flask import Flask, render_template, request
+import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
+import seaborn as sns
+import base64
+import io
 import numpy as np
 import pandas as pd
 import joblib
@@ -75,6 +82,84 @@ def save_prediction_to_history(aqi_value):
 @app.route("/")
 def home():
     return render_template("index.html", prediction=None)
+
+
+@app.route("/dataset")
+def dataset():
+    try:
+        df = pd.read_csv('data/features.csv')
+        data_rows = df.head(30).to_dict('records')
+        columns = df.columns.tolist()
+        return render_template("dataset.html", data_rows=data_rows, columns=columns)
+    except Exception as e:
+        return render_template("dataset.html", error=str(e))
+
+
+@app.route("/visualize")
+def visualize():
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import base64
+    import io
+    
+    # Load data
+    df = pd.read_csv('data/cleaned.csv')
+    
+    # Create plots
+    plots = {}
+    
+    # AQI Distribution
+    plt.figure(figsize=(8, 5))
+    sns.histplot(df['aqi'], bins=30, kde=True, color='skyblue')
+    plt.title('AQI Distribution', fontsize=16, color='white')
+    plt.xlabel('AQI', color='white')
+    plt.ylabel('Frequency', color='white')
+    plt.xticks(color='white')
+    plt.yticks(color='white')
+    plt.gca().set_facecolor('none')
+    plt.gcf().patch.set_alpha(0)
+    
+    img = io.BytesIO()
+    plt.savefig(img, format='png', transparent=True, bbox_inches='tight')
+    img.seek(0)
+    plots['aqi_dist'] = base64.b64encode(img.getvalue()).decode()
+    plt.close()
+    
+    # Correlation Heatmap
+    numeric_df = df.select_dtypes(include=['float64', 'int64'])
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(numeric_df.corr(), annot=True, cmap='coolwarm', center=0)
+    plt.title('Correlation Heatmap', fontsize=16, color='white')
+    plt.xticks(color='white')
+    plt.yticks(color='white')
+    plt.gca().set_facecolor('none')
+    plt.gcf().patch.set_alpha(0)
+    
+    img = io.BytesIO()
+    plt.savefig(img, format='png', transparent=True, bbox_inches='tight')
+    img.seek(0)
+    plots['correlation'] = base64.b64encode(img.getvalue()).decode()
+    plt.close()
+    
+    # City-wise AQI Distribution
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(data=df, x='city', y='aqi', palette='viridis')
+    plt.title('AQI Distribution by City', fontsize=16, color='white')
+    plt.xlabel('City', color='white')
+    plt.ylabel('AQI', color='white')
+    plt.xticks(rotation=45, color='white')
+    plt.yticks(color='white')
+    plt.gca().set_facecolor('none')
+    plt.gcf().patch.set_alpha(0)
+    
+    img = io.BytesIO()
+    plt.savefig(img, format='png', transparent=True, bbox_inches='tight')
+    img.seek(0)
+    plots['city_aqi'] = base64.b64encode(img.getvalue()).decode()
+    plt.close()
+    
+    return render_template("visualize.html", plots=plots)
 
 
 @app.route("/predict", methods=["POST"])
