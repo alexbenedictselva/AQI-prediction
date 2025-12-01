@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQI Prediction - Air Quality Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .floating-bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float-up linear infinite;
+            opacity: 0;
+        }
+
+        .bubble:nth-child(1) { left: 10%; width: 20px; height: 20px; animation-duration: 8s; animation-delay: 0s; }
+        .bubble:nth-child(2) { left: 20%; width: 15px; height: 15px; animation-duration: 10s; animation-delay: 1s; }
+        .bubble:nth-child(3) { left: 35%; width: 25px; height: 25px; animation-duration: 7s; animation-delay: 2s; }
+        .bubble:nth-child(4) { left: 50%; width: 18px; height: 18px; animation-duration: 9s; animation-delay: 0.5s; }
+        .bubble:nth-child(5) { left: 65%; width: 22px; height: 22px; animation-duration: 11s; animation-delay: 3s; }
+        .bubble:nth-child(6) { left: 80%; width: 16px; height: 16px; animation-duration: 8.5s; animation-delay: 1.5s; }
+        .bubble:nth-child(7) { left: 90%; width: 12px; height: 12px; animation-duration: 12s; animation-delay: 2.5s; }
+        .bubble:nth-child(8) { left: 5%; width: 30px; height: 30px; animation-duration: 6s; animation-delay: 4s; }
+        .bubble:nth-child(9) { left: 25%; width: 14px; height: 14px; animation-duration: 9.5s; animation-delay: 0.8s; }
+        .bubble:nth-child(10) { left: 75%; width: 28px; height: 28px; animation-duration: 7.5s; animation-delay: 3.5s; }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) scale(1);
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { color: white; font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
+        .header p { color: rgba(255,255,255,0.8); font-size: 1.1rem; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .input-group label {
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 10px;
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 400;
+            backdrop-filter: blur(15px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+            outline: none;
+        }
+
+        /* Hide number input spinners */
+        .input-wrapper input::-webkit-outer-spin-button,
+        .input-wrapper input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .input-wrapper input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Dropdown select styling */
+        .input-wrapper select {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 400;
+            backdrop-filter: blur(15px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+        }
+
+        .input-wrapper select:focus {
+            border-color: rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-3px);
+            box-shadow: 
+                inset 0 2px 8px rgba(0,0,0,0.1),
+                0 8px 25px rgba(255,255,255,0.1),
+                0 0 0 3px rgba(255,255,255,0.1);
+        }
+
+        .input-wrapper select:hover:not(:focus) {
+            border-color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-1px);
+        }
+
+        .input-wrapper select option {
+            background: rgba(30,30,50,0.95);
+            color: white;
+            padding: 10px;
+            border: none;
+        }
+
+        .input-wrapper select option:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .input-wrapper input::placeholder {
+            color: rgba(255,255,255,0.4);
+            font-weight: 300;
+        }
+
+        .input-wrapper input:focus {
+            border-color: rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-3px);
+            box-shadow: 
+                inset 0 2px 8px rgba(0,0,0,0.1),
+                0 8px 25px rgba(255,255,255,0.1),
+                0 0 0 3px rgba(255,255,255,0.1);
+        }
+
+        .input-wrapper input:hover:not(:focus) {
+            border-color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-1px);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: .3s;
+            box-shadow: 0 10px 30px rgba(238, 90, 36, 0.3);
+        }
+        .submit-btn:hover { transform: translateY(-3px); }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
+        }
+        .result h3 { color: white; font-size: 1.4rem; margin-bottom: 10px; }
+        .prediction-value { font-size: 2rem; font-weight: 700; color: #4ecdc4; }
+    </style>
+</head>
+<body>
+    <div class="floating-bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-wind"></i> AQI Intelligence</h1>
+            <p>Advanced Air Quality Prediction System</p>
+        </div>
+
+        <form id="aqi-form" action="/predict" method="POST">
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label>Select City</label>
+                <div class="input-wrapper">
+                    <select name="city" required>
+                        <option value="" disabled selected>Choose a city...</option>
+                        <option value="0">Delhi</option>
+                        <option value="1">Mumbai</option>
+                        <option value="2">Bangalore</option>
+                        <option value="3">Chennai</option>
+                        <option value="4">Kolkata</option>
+                        <option value="5">Hyderabad</option>
+                        <option value="6">Pune</option>
+                        <option value="7">Ahmedabad</option>
+                        <option value="8">Jaipur</option>
+                        <option value="9">Lucknow</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="input-group"><label>Carbon Monoxide (CO)</label><div class="input-wrapper"><input type="number" step="0.01" name="co" placeholder="Enter CO level" required></div></div>
+                <div class="input-group"><label>Nitric Oxide (NO)</label><div class="input-wrapper"><input type="number" step="0.01" name="no" placeholder="Enter NO level" required></div></div>
+                <div class="input-group"><label>Nitrogen Dioxide (NO₂)</label><div class="input-wrapper"><input type="number" step="0.01" name="no2" placeholder="Enter NO₂ level" required></div></div>
+                <div class="input-group"><label>Ozone (O₃)</label><div class="input-wrapper"><input type="number" step="0.01" name="o3" placeholder="Enter O₃ level" required></div></div>
+                <div class="input-group"><label>Sulfur Dioxide (SO₂)</label><div class="input-wrapper"><input type="number" step="0.01" name="so2" placeholder="Enter SO₂ level" required></div></div>
+                <div class="input-group"><label>Particulate Matter (PM2.5)</label><div class="input-wrapper"><input type="number" step="0.01" name="pm2_5" placeholder="Enter PM2.5 level" required></div></div>
+                <div class="input-group"><label>Particulate Matter (PM10)</label><div class="input-wrapper"><input type="number" step="0.01" name="pm10" placeholder="Enter PM10 level" required></div></div>
+                <div class="input-group"><label>Ammonia (NH₃)</label><div class="input-wrapper"><input type="number" step="0.01" name="nh3" placeholder="Enter NH₃ level" required></div></div>
+            </div>
+
+            <button type="submit" class="submit-btn"><i class="fas fa-chart-line"></i> Predict Air Quality Index</button>
+        </form>
+
+        <div id="result-container" style="display:none;">
+            <div class="result">
+                <h3>Prediction Result</h3>
+                <div class="prediction-value" id="prediction-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- hidden prediction container -->
+    <span id="hidden-pred" style="display:none;">{{ prediction }}</span>
+
+    <script>
+        const form = document.getElementById("aqi-form");
+        const resultContainer = document.getElementById("result-container");
+        const predictionText = document.getElementById("prediction-text");
+        const btn = document.querySelector(".submit-btn");
+
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Predicting...';
+
+            const formData = new FormData(form);
+
+            fetch('/predict', { method: 'POST', body: formData })
+            .then(res => res.text())
+            .then(html => {
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = html;
+                const hidden = tempDiv.querySelector("#hidden-pred");
+
+                if (hidden && hidden.textContent.trim() !== "") {
+                    predictionText.textContent = hidden.textContent.trim();
+                    resultContainer.style.display = "block";
+                } else {
+                    predictionText.textContent = "Error: No prediction received";
+                    resultContainer.style.display = "block";
+                }
+
+                btn.innerHTML = '<i class="fas fa-chart-line"></i> Predict Air Quality Index';
+            })
+            .catch(err => {
+                predictionText.textContent = "Error: " + err;
+                resultContainer.style.display = "block";
+                btn.innerHTML = '<i class="fas fa-chart-line"></i> Predict Air Quality Index';
+            });
+        });
+    </script>
+</body>
+</html>
