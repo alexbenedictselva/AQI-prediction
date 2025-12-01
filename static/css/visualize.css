@@ -1,0 +1,138 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding: 15px 30px;
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-end;
+    height: 60px;
+    align-items: center;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 8px 16px;
+    margin-left: 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.navbar a:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+}
+
+.navbar a.active {
+    background: rgba(255,255,255,0.2);
+    font-weight: 600;
+}
+
+.main-layout {
+    padding-top: 60px;
+    padding: 80px 20px 20px;
+}
+
+.chart-section {
+    display: flex;
+    margin-bottom: 40px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.2);
+    overflow: hidden;
+}
+
+.chart-description {
+    width: 50%;
+    padding: 30px;
+    background: rgba(255,255,255,0.05);
+}
+
+h1 {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.chart-container {
+    width: 50%;
+    background: rgba(255,255,255,0.1);
+    border-radius: 0;
+    padding: 20px;
+    margin: 0;
+    border: none;
+}
+
+.chart-title {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.chart-img {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+}
+
+.chart-description {
+    color: white;
+}
+
+.chart-description h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.chart-description h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.observation {
+    margin-bottom: 15px;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    border-left: 3px solid rgba(255,255,255,0.3);
+}
+
+.observation h4 {
+    font-size: 1rem;
+    margin-bottom: 6px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.chart-description p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 0;
+    opacity: 0.9;
+    margin-left: 15px;
+}
